@@ -12,14 +12,14 @@ export default function EvaluationResults({ onNext }: { onNext: () => void }) {
 
   useEffect(() => {
     if (!activeTenderId) return;
-    listBidders(activeTenderId).then((r) => setBidders(r.data));
+    listBidders(activeTenderId).then((r: any) => setBidders(r.data));
   }, [activeTenderId]);
 
   useEffect(() => {
     if (!activeBidderId) return;
     setLoading(true);
     getVerdicts(activeBidderId)
-      .then((r) => setVerdictData(r.data))
+      .then((r: any) => setVerdictData(r.data))
       .finally(() => setLoading(false));
   }, [activeBidderId]);
 
