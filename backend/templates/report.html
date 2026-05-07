@@ -4,111 +4,338 @@
     <meta charset="UTF-8">
     <title>Tender Evaluation Report</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; padding: 40px; font-size: 12px; line-height: 1.6; }
-        .header { text-align: center; border-bottom: 3px solid #16213e; padding-bottom: 20px; margin-bottom: 30px; }
-        .header h1 { font-size: 22px; color: #16213e; margin-bottom: 5px; }
-        .header p { font-size: 11px; color: #555; }
-        h2 { font-size: 16px; color: #16213e; margin: 25px 0 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        h3 { font-size: 14px; color: #0f3460; margin: 15px 0 8px; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0 20px; font-size: 11px; }
-        th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; vertical-align: top; }
-        th { background-color: #16213e; color: white; font-weight: 600; }
-        tr:nth-child(even) { background-color: #f8f9fa; }
-        .verdict-eligible { color: #28a745; font-weight: bold; }
-        .verdict-not-eligible { color: #dc3545; font-weight: bold; }
-        .verdict-review { color: #ffc107; font-weight: bold; }
-        .overall { font-size: 14px; padding: 10px; margin: 10px 0; border-radius: 4px; }
-        .overall-eligible { background: #d4edda; border: 1px solid #28a745; }
-        .overall-not-eligible { background: #f8d7da; border: 1px solid #dc3545; }
-        .overall-review { background: #fff3cd; border: 1px solid #ffc107; }
-        blockquote { margin: 5px 0; padding: 5px 10px; border-left: 3px solid #0f3460; background: #f0f4f8; font-style: italic; font-size: 10px; }
-        .footer { margin-top: 40px; border-top: 2px solid #16213e; padding-top: 15px; font-size: 10px; color: #555; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; }
-        .badge-mandatory { background: #e8daef; color: #6c3483; }
-        .badge-optional { background: #d5f5e3; color: #1e8449; }
-        @media print { body { padding: 20px; } }
+        @page {
+            size: A4;
+            margin: 18mm 14mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+            color: #1f2937;
+            font-size: 11px;
+            line-height: 1.45;
+            background: #ffffff;
+        }
+
+        .header {
+            border-bottom: 2px solid #111827;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+        }
+
+        .report-title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .report-subtitle {
+            font-size: 10px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .report-meta {
+            font-size: 10px;
+            color: #374151;
+        }
+
+        h2 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #111827;
+            margin: 14px 0 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #d1d5db;
+        }
+
+        h3 {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 10px 0 6px;
+        }
+
+        .summary-grid {
+            width: 100%;
+            margin-bottom: 12px;
+            border-collapse: collapse;
+        }
+
+        .summary-grid td {
+            width: 25%;
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            vertical-align: top;
+        }
+
+        .summary-label {
+            display: block;
+            font-size: 9px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 2px;
+        }
+
+        .summary-value {
+            font-size: 11px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 6px 0 12px;
+            page-break-inside: auto;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        th,
+        td {
+            border: 1px solid #e5e7eb;
+            padding: 6px;
+            vertical-align: top;
+            text-align: left;
+        }
+
+        th {
+            background: #f3f4f6;
+            color: #111827;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fcfcfd;
+        }
+
+        .chip {
+            display: inline-block;
+            border-radius: 999px;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+
+        .chip-mandatory {
+            color: #7c3aed;
+            background: #f5f3ff;
+            border-color: #ddd6fe;
+        }
+
+        .chip-optional {
+            color: #047857;
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+        }
+
+        .chip-eligible {
+            color: #166534;
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .chip-not-eligible {
+            color: #991b1b;
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .chip-review {
+            color: #92400e;
+            background: #fffbeb;
+            border-color: #fde68a;
+        }
+
+        .overall {
+            padding: 8px 10px;
+            margin: 6px 0 10px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            font-size: 11px;
+        }
+
+        .quote {
+            margin-top: 4px;
+            padding: 5px 6px;
+            border-left: 2px solid #9ca3af;
+            background: #f9fafb;
+            color: #4b5563;
+            font-style: italic;
+            font-size: 10px;
+        }
+
+        .muted {
+            color: #6b7280;
+            font-size: 10px;
+            margin-bottom: 6px;
+        }
+
+        .section-block {
+            page-break-inside: avoid;
+            margin-bottom: 8px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            border-top: 1px solid #d1d5db;
+            padding-top: 8px;
+            font-size: 10px;
+            color: #4b5563;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Consolidated Tender Evaluation Report</h1>
-        <p>AI-Based Tender Evaluation &amp; Eligibility Analysis System</p>
-        <p>Generated: {{ generated_at }}</p>
+        <div class="report-title">Consolidated Tender Evaluation Report</div>
+        <div class="report-subtitle">AI-assisted compliance analysis for procurement audit workflow</div>
+        <div class="report-meta">Generated on {{ generated_at }}</div>
     </div>
 
     <h2>1. Tender Summary</h2>
-    <table>
-        <tr><th>Field</th><th>Value</th></tr>
-        <tr><td>Tender File</td><td>{{ tender.filename }}</td></tr>
-        <tr><td>Upload Date</td><td>{{ tender.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
-        <tr><td>Total Criteria</td><td>{{ criteria | length }}</td></tr>
-        <tr><td>Total Bidders</td><td>{{ bidders | length }}</td></tr>
+    <table class="summary-grid">
+        <tr>
+            <td>
+                <span class="summary-label">Tender File</span>
+                <span class="summary-value">{{ tender.filename }}</span>
+            </td>
+            <td>
+                <span class="summary-label">Uploaded On</span>
+                <span class="summary-value">{{ tender.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+            </td>
+            <td>
+                <span class="summary-label">Total Criteria</span>
+                <span class="summary-value">{{ criteria | length }}</span>
+            </td>
+            <td>
+                <span class="summary-label">Total Bidders</span>
+                <span class="summary-value">{{ bidders | length }}</span>
+            </td>
+        </tr>
     </table>
 
     <h2>2. Extracted Eligibility Criteria</h2>
     <table>
-        <tr>
-            <th>#</th><th>Criterion</th><th>Type</th><th>Mandatory</th><th>Threshold</th>
-        </tr>
+        <thead>
+            <tr>
+                <th style="width: 6%">#</th>
+                <th style="width: 46%">Criterion</th>
+                <th style="width: 16%">Type</th>
+                <th style="width: 16%">Requirement</th>
+                <th style="width: 16%">Threshold</th>
+            </tr>
+        </thead>
+        <tbody>
         {% for c in criteria %}
         <tr>
             <td>{{ loop.index }}</td>
             <td>{{ c.text }}</td>
             <td>{{ c.type }}</td>
-            <td><span class="badge {{ 'badge-mandatory' if c.is_mandatory else 'badge-optional' }}">{{ 'Mandatory' if c.is_mandatory else 'Optional' }}</span></td>
+            <td><span class="chip {{ 'chip-mandatory' if c.is_mandatory else 'chip-optional' }}">{{ 'Mandatory' if c.is_mandatory else 'Optional' }}</span></td>
             <td>{{ c.threshold or '-' }}</td>
         </tr>
         {% endfor %}
+        </tbody>
     </table>
 
     {% for bidder in bidders %}
-    <h2>3.{{ loop.index }} Bidder: {{ bidder.name }}</h2>
+    <div class="section-block">
+        <h2>3.{{ loop.index }} Bidder Evaluation - {{ bidder.name }}</h2>
 
-    <div class="overall {{ 'overall-eligible' if bidder.overall_verdict == 'Eligible' else ('overall-not-eligible' if bidder.overall_verdict == 'Not Eligible' else 'overall-review') }}">
-        <strong>Overall Verdict:</strong> {{ bidder.overall_verdict }}
+        <div class="overall">
+            <strong>Overall Verdict:</strong> {{ bidder.overall_verdict }}
+            <span style="margin-left: 8px;" class="chip {{ 'chip-eligible' if bidder.overall_verdict == 'Eligible' else ('chip-not-eligible' if bidder.overall_verdict == 'Not Eligible' else 'chip-review') }}">
+                {{ bidder.overall_verdict }}
+            </span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 27%">Criterion</th>
+                    <th style="width: 10%">Type</th>
+                    <th style="width: 19%">Extracted Value</th>
+                    <th style="width: 12%">Verdict</th>
+                    <th style="width: 22%">Explanation</th>
+                    <th style="width: 10%">Confidence</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for v in bidder.verdicts %}
+            <tr>
+                <td>
+                    {{ v.criterion_text }}
+                    <div style="margin-top: 4px;">
+                        <span class="chip {{ 'chip-mandatory' if v.is_mandatory else 'chip-optional' }}">{{ 'Mandatory' if v.is_mandatory else 'Optional' }}</span>
+                    </div>
+                </td>
+                <td>{{ v.criterion_type }}</td>
+                <td>
+                    {{ v.extracted_value or '-' }}
+                    {% if v.verbatim_quote %}<div class="quote">{{ v.verbatim_quote }}</div>{% endif %}
+                </td>
+                <td><span class="chip {{ 'chip-eligible' if v.verdict == 'Eligible' else ('chip-not-eligible' if v.verdict == 'Not Eligible' else 'chip-review') }}">{{ v.verdict }}</span></td>
+                <td>{{ v.explanation }}</td>
+                <td>
+                    E: {{ '%.0f' | format(v.extraction_confidence * 100) }}%<br>
+                    M: {{ '%.0f' | format(v.match_confidence * 100) }}%
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% if bidder.verdicts | selectattr('reviews') | list %}
+        <h3>Human Reviews for {{ bidder.name }}</h3>
+        <div class="muted">Manual interventions and final reviewer rationale for flagged criteria.</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 30%">Criterion</th>
+                    <th style="width: 12%">Decision</th>
+                    <th style="width: 34%">Reason</th>
+                    <th style="width: 12%">Reviewer</th>
+                    <th style="width: 12%">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for v in bidder.verdicts %}
+            {% for r in v.reviews %}
+            <tr>
+                <td>{{ v.criterion_text }}</td>
+                <td><span class="chip {{ 'chip-eligible' if r.decision == 'Eligible' else ('chip-not-eligible' if r.decision == 'Not Eligible' else 'chip-review') }}">{{ r.decision }}</span></td>
+                <td>{{ r.reason }}</td>
+                <td>{{ r.reviewer }}</td>
+                <td>{{ r.created_at }}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
     </div>
-
-    <table>
-        <tr>
-            <th>Criterion</th><th>Type</th><th>Extracted Value</th>
-            <th>Verdict</th><th>Explanation</th><th>Confidence</th>
-        </tr>
-        {% for v in bidder.verdicts %}
-        <tr>
-            <td>{{ v.criterion_text }}
-                <span class="badge {{ 'badge-mandatory' if v.is_mandatory else 'badge-optional' }}">{{ 'M' if v.is_mandatory else 'O' }}</span>
-            </td>
-            <td>{{ v.criterion_type }}</td>
-            <td>{{ v.extracted_value or '-' }}
-                {% if v.verbatim_quote %}<blockquote>{{ v.verbatim_quote }}</blockquote>{% endif %}
-            </td>
-            <td class="{{ 'verdict-eligible' if v.verdict == 'Eligible' else ('verdict-not-eligible' if v.verdict == 'Not Eligible' else 'verdict-review') }}">
-                {{ v.verdict }}
-            </td>
-            <td>{{ v.explanation }}</td>
-            <td>E: {{ '%.0f' | format(v.extraction_confidence * 100) }}%<br>M: {{ '%.0f' | format(v.match_confidence * 100) }}%</td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    {% if bidder.verdicts | selectattr('reviews') | list %}
-    <h3>Human Reviews for {{ bidder.name }}</h3>
-    <table>
-        <tr><th>Criterion</th><th>Decision</th><th>Reason</th><th>Reviewer</th><th>Date</th></tr>
-        {% for v in bidder.verdicts %}
-        {% for r in v.reviews %}
-        <tr>
-            <td>{{ v.criterion_text }}</td>
-            <td class="{{ 'verdict-eligible' if r.decision == 'Eligible' else 'verdict-not-eligible' }}">{{ r.decision }}</td>
-            <td>{{ r.reason }}</td>
-            <td>{{ r.reviewer }}</td>
-            <td>{{ r.created_at }}</td>
-        </tr>
-        {% endfor %}
-        {% endfor %}
-    </table>
-    {% endif %}
     {% endfor %}
 
     <div class="footer">
