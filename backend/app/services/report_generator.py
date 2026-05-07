@@ -87,62 +87,14 @@ def generate_report_html(tender_id: int, db: Session) -> str:
     return html
 
 
-def _find_browser_executable() -> str | None:
-    candidates = [
-        shutil.which("msedge"),
-        shutil.which("chrome"),
-        shutil.which("chromium"),
-        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-        r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
-        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-    ]
-
-    for candidate in candidates:
-        if candidate and os.path.exists(candidate):
-            return candidate
-
-    return None
-
-
 def _render_html_to_pdf(html: str, pdf_path: str):
-    browser = _find_browser_executable()
-    if not browser:
-        raise RuntimeError("No Chromium-based browser found for HTML-to-PDF rendering.")
-
+    from weasyprint import HTML
+    
     output_dir = os.path.dirname(os.path.abspath(pdf_path))
     os.makedirs(output_dir, exist_ok=True)
-
-    tmp_dir = os.path.join(output_dir, f"report_render_{uuid.uuid4().hex}")
-    os.makedirs(tmp_dir, exist_ok=True)
-    try:
-        html_path = os.path.join(tmp_dir, "report.html")
-        temp_pdf_path = os.path.join(tmp_dir, "report.pdf")
-        user_data_dir = os.path.join(tmp_dir, "browser-profile")
-
-        with open(html_path, "w", encoding="utf-8") as f:
-            f.write(html)
-
-        command = [
-            browser,
-            "--headless",
-            "--disable-gpu",
-            "--no-first-run",
-            "--disable-extensions",
-            f"--user-data-dir={user_data_dir}",
-            "--no-pdf-header-footer",
-            "--print-to-pdf-no-header",
-            f"--print-to-pdf={temp_pdf_path}",
-            Path(html_path).as_uri(),
-        ]
-        result = subprocess.run(command, capture_output=True, text=True, timeout=60)
-        if result.returncode != 0 or not os.path.exists(temp_pdf_path):
-            details = (result.stderr or result.stdout or "Browser PDF rendering failed.").strip()
-            raise RuntimeError(details)
-
-        os.replace(temp_pdf_path, pdf_path)
-    finally:
-        shutil.rmtree(tmp_dir, ignore_errors=True)
+    
+    # WeasyPrint renders the HTML string directly to the PDF file
+    HTML(string=html).write_pdf(pdf_path)
 
 
 def save_report_pdf(tender_id: int, db: Session) -> str:
