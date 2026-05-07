@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tender Evaluation Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; padding: 40px; font-size: 12px; line-height: 1.6; }
+        .header { text-align: center; border-bottom: 3px solid #16213e; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { font-size: 22px; color: #16213e; margin-bottom: 5px; }
+        .header p { font-size: 11px; color: #555; }
+        h2 { font-size: 16px; color: #16213e; margin: 25px 0 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        h3 { font-size: 14px; color: #0f3460; margin: 15px 0 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0 20px; font-size: 11px; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; vertical-align: top; }
+        th { background-color: #16213e; color: white; font-weight: 600; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        .verdict-eligible { color: #28a745; font-weight: bold; }
+        .verdict-not-eligible { color: #dc3545; font-weight: bold; }
+        .verdict-review { color: #ffc107; font-weight: bold; }
+        .overall { font-size: 14px; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .overall-eligible { background: #d4edda; border: 1px solid #28a745; }
+        .overall-not-eligible { background: #f8d7da; border: 1px solid #dc3545; }
+        .overall-review { background: #fff3cd; border: 1px solid #ffc107; }
+        blockquote { margin: 5px 0; padding: 5px 10px; border-left: 3px solid #0f3460; background: #f0f4f8; font-style: italic; font-size: 10px; }
+        .footer { margin-top: 40px; border-top: 2px solid #16213e; padding-top: 15px; font-size: 10px; color: #555; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+        .badge-mandatory { background: #e8daef; color: #6c3483; }
+        .badge-optional { background: #d5f5e3; color: #1e8449; }
+        @media print { body { padding: 20px; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Consolidated Tender Evaluation Report</h1>
+        <p>AI-Based Tender Evaluation &amp; Eligibility Analysis System</p>
+        <p>Generated: {{ generated_at }}</p>
+    </div>
+
+    <h2>1. Tender Summary</h2>
+    <table>
+        <tr><th>Field</th><th>Value</th></tr>
+        <tr><td>Tender File</td><td>{{ tender.filename }}</td></tr>
+        <tr><td>Upload Date</td><td>{{ tender.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+        <tr><td>Total Criteria</td><td>{{ criteria | length }}</td></tr>
+        <tr><td>Total Bidders</td><td>{{ bidders | length }}</td></tr>
+    </table>
+
+    <h2>2. Extracted Eligibility Criteria</h2>
+    <table>
+        <tr>
+            <th>#</th><th>Criterion</th><th>Type</th><th>Mandatory</th><th>Threshold</th>
+        </tr>
+        {% for c in criteria %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ c.text }}</td>
+            <td>{{ c.type }}</td>
+            <td><span class="badge {{ 'badge-mandatory' if c.is_mandatory else 'badge-optional' }}">{{ 'Mandatory' if c.is_mandatory else 'Optional' }}</span></td>
+            <td>{{ c.threshold or '-' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% for bidder in bidders %}
+    <h2>3.{{ loop.index }} Bidder: {{ bidder.name }}</h2>
+
+    <div class="overall {{ 'overall-eligible' if bidder.overall_verdict == 'Eligible' else ('overall-not-eligible' if bidder.overall_verdict == 'Not Eligible' else 'overall-review') }}">
+        <strong>Overall Verdict:</strong> {{ bidder.overall_verdict }}
+    </div>
+
+    <table>
+        <tr>
+            <th>Criterion</th><th>Type</th><th>Extracted Value</th>
+            <th>Verdict</th><th>Explanation</th><th>Confidence</th>
+        </tr>
+        {% for v in bidder.verdicts %}
+        <tr>
+            <td>{{ v.criterion_text }}
+                <span class="badge {{ 'badge-mandatory' if v.is_mandatory else 'badge-optional' }}">{{ 'M' if v.is_mandatory else 'O' }}</span>
+            </td>
+            <td>{{ v.criterion_type }}</td>
+            <td>{{ v.extracted_value or '-' }}
+                {% if v.verbatim_quote %}<blockquote>{{ v.verbatim_quote }}</blockquote>{% endif %}
+            </td>
+            <td class="{{ 'verdict-eligible' if v.verdict == 'Eligible' else ('verdict-not-eligible' if v.verdict == 'Not Eligible' else 'verdict-review') }}">
+                {{ v.verdict }}
+            </td>
+            <td>{{ v.explanation }}</td>
+            <td>E: {{ '%.0f' | format(v.extraction_confidence * 100) }}%<br>M: {{ '%.0f' | format(v.match_confidence * 100) }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% if bidder.verdicts | selectattr('reviews') | list %}
+    <h3>Human Reviews for {{ bidder.name }}</h3>
+    <table>
+        <tr><th>Criterion</th><th>Decision</th><th>Reason</th><th>Reviewer</th><th>Date</th></tr>
+        {% for v in bidder.verdicts %}
+        {% for r in v.reviews %}
+        <tr>
+            <td>{{ v.criterion_text }}</td>
+            <td class="{{ 'verdict-eligible' if r.decision == 'Eligible' else 'verdict-not-eligible' }}">{{ r.decision }}</td>
+            <td>{{ r.reason }}</td>
+            <td>{{ r.reviewer }}</td>
+            <td>{{ r.created_at }}</td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </table>
+    {% endif %}
+    {% endfor %}
+
+    <div class="footer">
+        <p><strong>Disclaimer:</strong> This report is AI-assisted and human-reviewed. Final procurement decisions rest with the authorised officer.</p>
+        <p>Approved by: _________________________ &nbsp;&nbsp; Designation: _________________________ &nbsp;&nbsp; Date: _____________</p>
+    </div>
+</body>
+</html>

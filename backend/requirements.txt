@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pymupdf
+sqlalchemy==2.0.35
+pg8000
+google-generativeai==0.8.3
+python-dotenv==1.0.1
+pydantic-settings==2.5.2
+jinja2==3.1.4
+weasyprint==62.3
+aiofiles==24.1.0
