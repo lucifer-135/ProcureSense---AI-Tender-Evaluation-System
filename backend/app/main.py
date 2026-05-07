@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api import tenders, bidders, verdicts, reports
+from .database import Base, engine
+
+# Create tables on startup
+Base.metadata.create_all(bind=engine)
 
 from .config import get_settings
 
