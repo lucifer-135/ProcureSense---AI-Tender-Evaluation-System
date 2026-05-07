@@ -118,4 +118,4 @@ npm run dev
 Distributed under the Apache License 2.0. See `LICENSE` for more information.
 
 ---
-*Developed for the AI-Based Tender Evaluation Challenge.*
+*Developed for the AI for Bharat Hackathon - By PanIIT.*
