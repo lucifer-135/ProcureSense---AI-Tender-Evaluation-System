@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const api = axios.create({ baseURL: "http://localhost:8000/api" });
+const api = axios.create({ 
+  baseURL: (import.meta.env.VITE_API_URL || "http://localhost:8000") + "/api" 
+});
 
 // ── Tenders ────────────────────────────────────────────────────
 export const uploadTender = (file: File) => {
@@ -50,6 +52,6 @@ export const submitReview = (verdictId: number, data: any) =>
 export const generateReport = (tenderId: number) =>
   api.post(`/tenders/${tenderId}/report`);
 export const downloadReportUrl = (tenderId: number) =>
-  `http://localhost:8000/api/tenders/${tenderId}/report/download`;
+  `${api.defaults.baseURL}/tenders/${tenderId}/report/download`;
 
 export default api;

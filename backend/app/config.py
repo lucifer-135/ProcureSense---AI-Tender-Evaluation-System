@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     UPLOAD_DIR: str = "uploads"
     OUTPUT_DIR: str = "outputs"
+    CORS_ORIGINS: list[str] = ["*"]
 
     class Config:
         env_file = ".env"
