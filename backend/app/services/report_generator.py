@@ -1,9 +1,5 @@
 import os
-import shutil
-import subprocess
-import uuid
 from datetime import datetime
-from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy.orm import Session
 from ..models import Tender, Criterion, Bidder, Verdict, HumanReview, BidderEvidence
